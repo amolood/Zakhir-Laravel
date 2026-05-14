@@ -1,0 +1,73 @@
+{
+    "name": "amolood/zakhir-laravel",
+    "description": "Official Laravel package for the Zakhir payment gateway",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "zakhir",
+        "payment",
+        "gateway",
+        "sudan",
+        "sdg",
+        "digitalize"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Abdalrahman Molood",
+            "email": "amolood@icloud.com",
+            "homepage": "https://amolood.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/amolood/Zakhir-Laravel",
+    "support": {
+        "issues": "https://github.com/amolood/Zakhir-Laravel/issues",
+        "source": "https://github.com/amolood/Zakhir-Laravel"
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/database": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "phpunit/phpunit": "^10.0|^11.0",
+        "mockery/mockery": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Zakhir\\LaravelZakhir\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Zakhir\\LaravelZakhir\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Zakhir\\LaravelZakhir\\ZakhirServiceProvider"
+            ],
+            "aliases": {
+                "Zakhir": "Zakhir\\LaravelZakhir\\Facades\\Zakhir"
+            }
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test:unit": "vendor/bin/phpunit --testsuite=Unit",
+        "test:feature": "vendor/bin/phpunit --testsuite=Feature"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

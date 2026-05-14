@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+# Strip these paths from the distributed archive (composer install --prefer-dist)
+/.gitattributes    export-ignore
+/.gitignore        export-ignore
+/.phpunit.cache    export-ignore
+/phpunit.xml       export-ignore
+/tests/            export-ignore
+/CHANGELOG.md      export-ignore

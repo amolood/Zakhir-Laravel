@@ -18,10 +18,10 @@ return [
     | Production Credentials
     |--------------------------------------------------------------------------
     |
-    | Obtain these from your Zakhir merchant dashboard at https://zakhir.cloud
+    | Obtain these from your Zakhir merchant dashboard at https://zakhir.net
     |
     */
-    'base_url' => 'https://zakhir.cloud/api/',
+    'base_url' => 'https://zakhir.net/api/',
     'tenant'   => '',
     'profile'  => '',
     'api_key'  => '',

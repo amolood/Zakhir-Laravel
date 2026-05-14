@@ -110,7 +110,7 @@ return [
     'environment' => 'production',
 
     // Production credentials — from your Zakhir merchant dashboard
-    'base_url' => 'https://zakhir.cloud/api/',
+    'base_url' => 'https://zakhir.net/api/',
     'tenant'   => 'your_tenant_id',
     'profile'  => 'your_profile_id',
     'api_key'  => 'your_api_key',
@@ -174,7 +174,7 @@ Set `environment` to `"staging"` and fill in the staging credentials block. The 
 
 ```php
 'environment'    => 'staging',
-'staging_base_url' => 'https://staging.zakhir.cloud/api/',
+'staging_base_url' => 'https://staging.zakhir.net/api/',
 'staging_tenant'   => 'staging_tenant_id',
 'staging_profile'  => 'staging_profile_id',
 'staging_api_key'  => 'staging_api_key',

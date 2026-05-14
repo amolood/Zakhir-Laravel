@@ -16,7 +16,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         $app['config']->set('zakhir', [
             'environment' => 'production',
-            'base_url'    => 'https://zakhir.cloud/api/',
+            'base_url'    => 'https://zakhir.net/api/',
             'tenant'      => 'test-tenant',
             'profile'     => 'test-profile',
             'api_key'     => 'test-api-key',

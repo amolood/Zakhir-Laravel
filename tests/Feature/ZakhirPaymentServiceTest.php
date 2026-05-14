@@ -22,7 +22,7 @@ class ZakhirPaymentServiceTest extends TestCase
                 'expiresAt' => '2026-05-15T10:00:00Z',
             ],
             'checkoutPage' => [
-                'url'          => 'https://checkout.zakhir.cloud/pay/tok_abc123',
+                'url'          => 'https://checkout.zakhir.net/pay/tok_abc123',
                 'mobileAppUrl' => 'zakhir://pay/tok_abc123',
             ],
         ];
@@ -43,7 +43,7 @@ class ZakhirPaymentServiceTest extends TestCase
         $this->assertInstanceOf(PaymentResponse::class, $response);
         $this->assertSame('zakhir-pay-id-001', $response->id);
         $this->assertSame('PENDING', $response->status);
-        $this->assertSame('https://checkout.zakhir.cloud/pay/tok_abc123', $response->checkoutUrl);
+        $this->assertSame('https://checkout.zakhir.net/pay/tok_abc123', $response->checkoutUrl);
         $this->assertTrue($response->isPending());
         $this->assertFalse($response->isCompleted());
     }

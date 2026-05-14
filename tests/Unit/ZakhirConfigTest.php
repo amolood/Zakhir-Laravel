@@ -12,7 +12,7 @@ class ZakhirConfigTest extends TestCase
     {
         return new ZakhirConfig(array_merge([
             'environment' => 'production',
-            'base_url'    => 'https://zakhir.cloud/api/',
+            'base_url'    => 'https://zakhir.net/api/',
             'tenant'      => 'tenant-1',
             'profile'     => 'profile-1',
             'api_key'     => 'key-abc',
@@ -35,7 +35,7 @@ class ZakhirConfigTest extends TestCase
 
     public function test_base_url_has_ecommerce_suffix(): void
     {
-        $config = $this->makeConfig(['base_url' => 'https://zakhir.cloud/api']);
+        $config = $this->makeConfig(['base_url' => 'https://zakhir.net/api']);
         $this->assertStringEndsWith('/api/ecommerce/', $config->baseUrl());
     }
 
@@ -43,7 +43,7 @@ class ZakhirConfigTest extends TestCase
     {
         $config = $this->makeConfig([
             'environment'      => 'staging',
-            'staging_base_url' => 'https://staging.zakhir.cloud/api/',
+            'staging_base_url' => 'https://staging.zakhir.net/api/',
             'staging_tenant'   => 'stg-tenant',
             'staging_profile'  => 'stg-profile',
             'staging_api_key'  => 'stg-key',

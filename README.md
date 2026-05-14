@@ -39,7 +39,6 @@
 - [Webhook Handling](#webhook-handling)
   - [Registering a Payment](#registering-a-payment)
   - [Listening to Events](#listening-to-events)
-  - [Webhook Security](#webhook-security)
 - [Database](#database)
   - [Migrations](#migrations)
   - [ZakhirPayment Model](#zakhirpayment-model)
@@ -127,10 +126,6 @@ return [
     // Where customers are redirected after checkout
     'return_url' => 'https://yourdomain.com/orders/return',
 
-    // Optional HMAC-SHA256 secret for webhook signature verification
-    // Leave empty to skip signature checks
-    'webhook_secret' => '',
-
     // HTTP timeout in seconds
     'timeout' => 15,
 
@@ -161,7 +156,6 @@ return [
 | `staging_api_key`   | `string` | Staging API key                                 |
 | `webhook_url`       | `string` | Public URL where Zakhir sends status callbacks  |
 | `return_url`        | `string` | URL customers land on after checkout            |
-| `webhook_secret`    | `string` | HMAC secret for webhook verification (optional) |
 | `timeout`           | `int`    | HTTP request timeout in seconds                 |
 | `logging`           | `bool`   | Write every API call to `zakhir_logs` table     |
 | `routes.enabled`    | `bool`   | Auto-register the built-in webhook route        |
@@ -391,16 +385,6 @@ class HandleZakhirPayment
 }
 ```
 
-### Webhook Security
-
-If you set `ZAKHIR_WEBHOOK_SECRET`, the `VerifyZakhirWebhookSignature` middleware validates every incoming webhook using HMAC-SHA256:
-
-```
-X-Zakhir-Signature: sha256=<hmac_hex>
-```
-
-If the secret is empty the middleware is a no-op — no signature check is performed. To enforce it, always configure the secret in production.
-
 ---
 
 ## Database
@@ -564,7 +548,7 @@ src/
 │   ├── Controllers/
 │   │   └── ZakhirWebhookController.php  Processes COMPLETED / REJECTED webhooks
 │   └── Middleware/
-│       └── VerifyZakhirWebhookSignature.php  Optional HMAC-SHA256 guard
+│       └── VerifyZakhirWebhookSignature.php  Passthrough middleware (no signature required)
 │
 ├── Data/                              Typed DTOs — no raw arrays leaking across boundaries
 │   ├── CreatePaymentData.php

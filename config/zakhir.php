@@ -56,17 +56,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Webhook Secret  (optional — recommended in production)
-    |--------------------------------------------------------------------------
-    |
-    | When set, every incoming webhook is verified using HMAC-SHA256 against
-    | the X-Zakhir-Signature header. Leave empty to skip signature checks.
-    |
-    */
-    'webhook_secret' => '',
-
-    /*
-    |--------------------------------------------------------------------------
     | HTTP Timeout
     |--------------------------------------------------------------------------
     |

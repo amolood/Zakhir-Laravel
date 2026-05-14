@@ -63,11 +63,6 @@ class ZakhirConfig
         return (string) ($this->config['return_url'] ?? '');
     }
 
-    public function webhookSecret(): string
-    {
-        return (string) ($this->config['webhook_secret'] ?? '');
-    }
-
     public function loggingEnabled(): bool
     {
         return (bool) ($this->config['logging'] ?? true);

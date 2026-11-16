@@ -47,8 +47,15 @@ class ZakhirWebhookController extends Controller
             return response()->json(['status' => 'received']);
         }
 
+        // Only Zakhir's own answer is used (never the callback's id), and it must be about this payment
+        if ($verified->referenceId !== '' && $verified->referenceId !== $referenceId) {
+            Log::warning('[Zakhir] Webhook: status answer is for another payment.', ['referenceId' => $referenceId]);
+
+            return response()->json(['status' => 'received']);
+        }
+
         $status = $verified->status;
-        $id     = $verified->id !== '' ? $verified->id : $id;
+        $id     = $verified->id;
         $raw    = $verified->raw;
 
         $payload = WebhookPayload::fromArray(array_merge($raw, [

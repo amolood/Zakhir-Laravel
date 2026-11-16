@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Zakhir\LaravelZakhir\Contracts\ZakhirClientInterface;
 use Zakhir\LaravelZakhir\Data\WebhookPayload;
 use Zakhir\LaravelZakhir\Enums\PaymentStatus;
 use Zakhir\LaravelZakhir\Events\ZakhirPaymentCompleted;
@@ -17,7 +18,7 @@ use Zakhir\LaravelZakhir\Models\ZakhirPayment;
 
 class ZakhirWebhookController extends Controller
 {
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, ZakhirClientInterface $client): JsonResponse
     {
         $raw = $request->all();
 
@@ -31,6 +32,24 @@ class ZakhirWebhookController extends Controller
 
             return response()->json(['status' => 'received']);
         }
+
+        // Zakhir does not sign its callbacks, so the request only says which payment to look at: anyone
+        // can POST "COMPLETED". The status (and Zakhir's payment id) are read back from Zakhir itself, and
+        // nothing changes when Zakhir can't be asked.
+        try {
+            $verified = $client->getPaymentStatus($referenceId);
+        } catch (\Throwable $e) {
+            Log::warning('[Zakhir] Webhook: could not confirm the status with Zakhir.', [
+                'referenceId' => $referenceId,
+                'error'       => $e->getMessage(),
+            ]);
+
+            return response()->json(['status' => 'received']);
+        }
+
+        $status = $verified->status;
+        $id     = $verified->id !== '' ? $verified->id : $id;
+        $raw    = $verified->raw;
 
         $payload = WebhookPayload::fromArray(array_merge($raw, [
             'id'          => $id,

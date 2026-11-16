@@ -5,6 +5,14 @@ All notable changes to `laravel-zakhir` will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+- Webhook: the callback is no longer trusted. Zakhir does not sign its callbacks, so anyone could POST
+  `status=COMPLETED` for a known `referenceId` and have the payment marked completed. The controller now
+  reads the status (and Zakhir's payment id) back from `GET payments/{referenceId}/status` and changes
+  nothing when Zakhir can't be reached.
+
 ## [1.0.0] — 2025-05-14
 
 ### Added

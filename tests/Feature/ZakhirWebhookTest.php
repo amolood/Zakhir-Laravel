@@ -3,6 +3,8 @@
 namespace Zakhir\LaravelZakhir\Tests\Feature;
 
 use Illuminate\Support\Facades\Event;
+use Zakhir\LaravelZakhir\Contracts\ZakhirClientInterface;
+use Zakhir\LaravelZakhir\Data\PaymentStatusResponse;
 use Zakhir\LaravelZakhir\Events\ZakhirPaymentCompleted;
 use Zakhir\LaravelZakhir\Events\ZakhirPaymentFailed;
 use Zakhir\LaravelZakhir\Events\ZakhirWebhookReceived;
@@ -31,6 +33,23 @@ class ZakhirWebhookTest extends TestCase
         $app['config']->set('zakhir.routes.enabled', true);
     }
 
+    /** Zakhir's own answer when the controller asks for the payment's status. */
+    private function zakhirReports(string $status, string $id = 'zakhir-gateway-id-001'): void
+    {
+        $this->app->instance(ZakhirClientInterface::class, new class($status, $id) implements ZakhirClientInterface {
+            public function __construct(private string $status, private string $id) {}
+
+            public function createPayment(\Zakhir\LaravelZakhir\Data\CreatePaymentData $data): \Zakhir\LaravelZakhir\Data\PaymentResponse { throw new \LogicException('not used'); }
+
+            public function getPaymentStatus(string $referenceId): PaymentStatusResponse
+            {
+                return PaymentStatusResponse::fromArray(['referenceId' => $referenceId, 'status' => $this->status, 'id' => $this->id]);
+            }
+
+            public function cancelPayment(string $referenceId): array { return []; }
+        });
+    }
+
     private function createPendingPayment(string $referenceId): ZakhirPayment
     {
         return ZakhirPayment::create([
@@ -55,6 +74,7 @@ class ZakhirWebhookTest extends TestCase
     public function test_completed_webhook_marks_payment_completed(): void
     {
         Event::fake();
+        $this->zakhirReports('COMPLETED');
 
         $this->createPendingPayment('ref-abc-123');
 
@@ -78,6 +98,7 @@ class ZakhirWebhookTest extends TestCase
     public function test_completed_webhook_is_idempotent(): void
     {
         Event::fake();
+        $this->zakhirReports('COMPLETED', 'gw-id-456');
 
         $this->createPendingPayment('ref-idem-456');
 
@@ -101,6 +122,7 @@ class ZakhirWebhookTest extends TestCase
     public function test_rejected_webhook_marks_payment_failed(): void
     {
         Event::fake();
+        $this->zakhirReports('REJECTED', 'gw-id-789');
 
         $this->createPendingPayment('ref-rejected-789');
 
@@ -123,6 +145,7 @@ class ZakhirWebhookTest extends TestCase
     public function test_unknown_status_returns_received_without_error(): void
     {
         Event::fake();
+        $this->zakhirReports('PROCESSING', 'gw-id-999');
 
         $this->createPendingPayment('ref-unknown-999');
 
@@ -138,5 +161,28 @@ class ZakhirWebhookTest extends TestCase
             'reference_id' => 'ref-unknown-999',
             'status'       => 'PENDING',
         ]);
+    }
+
+    public function test_forged_completed_webhook_is_ignored_when_zakhir_says_pending(): void
+    {
+        Event::fake();
+        $this->zakhirReports('PENDING');
+        $this->createPendingPayment('ref-forged-1');
+
+        $this->postJson('/api/zakhir/webhook', ['referenceId' => 'ref-forged-1', 'status' => 'COMPLETED'])->assertOk();
+
+        $this->assertDatabaseHas('zakhir_payments', ['reference_id' => 'ref-forged-1', 'status' => 'PENDING']);
+        Event::assertNotDispatched(ZakhirPaymentCompleted::class);
+    }
+
+    public function test_webhook_changes_nothing_when_zakhir_cannot_be_reached(): void
+    {
+        Event::fake();
+        $this->app->instance(ZakhirClientInterface::class, \Mockery::mock(ZakhirClientInterface::class, fn ($m) => $m->shouldReceive('getPaymentStatus')->andThrow(new \RuntimeException('down'))));
+        $this->createPendingPayment('ref-down-1');
+
+        $this->postJson('/api/zakhir/webhook', ['referenceId' => 'ref-down-1', 'status' => 'COMPLETED'])->assertOk();
+
+        $this->assertDatabaseHas('zakhir_payments', ['reference_id' => 'ref-down-1', 'status' => 'PENDING']);
     }
 }
